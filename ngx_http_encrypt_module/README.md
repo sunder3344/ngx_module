@@ -49,6 +49,8 @@ encrypt request url parameters authorization, support MD5, AES, DES（for furthe
 
 > Note: each `location` can config like this.
 
+> Note: AES online tool  [AES](https://www.ssleye.com/ssltool/aes_cipher.html)
+
 ## module response
 the response header will give you a key "Auth-Result"
 > `param_error`: wrong or lack of parameters
