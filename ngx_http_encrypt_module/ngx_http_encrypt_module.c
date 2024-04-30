@@ -7,6 +7,7 @@
 #include <ngx_config.h>
 #include <ngx_core.h>
 #include <ngx_http.h>
+#include <openssl/evp.h>
 
 //----------------------------------------------for AES--------------------------------------------------
 #define BLOCKSIZE 16
@@ -56,6 +57,35 @@ static ngx_int_t ngx_http_encrypt_init(ngx_conf_t *cf);
 static ngx_int_t ngx_http_encrypt_combine_params(ngx_array_t *requires, ngx_log_t *log, char *content, ngx_http_headers_in_t *headers_in);
 static char *ngx_http_encrypt_param(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);
 void ngx_http_encrypt_content(ngx_str_t encrypt_type, ngx_str_t encrypt_key, char *content, char **result, ngx_http_request_t *r);
+//-------------------------------------------------------------------------------------------------------
+
+//--------------------------------------------------for AES----------------------------------------------
+int aes_encrypt(const unsigned char *plaintext, int plaintext_len,
+                 const unsigned char *key, unsigned char *ciphertext)
+{
+    EVP_CIPHER_CTX *ctx;
+    int len;
+    int ciphertext_len;
+
+    if (!(ctx = EVP_CIPHER_CTX_new()))
+        return -1;
+
+    if (1 != EVP_EncryptInit_ex(ctx, EVP_aes_256_ecb(), NULL, key, NULL))
+        return -1;
+
+    if (1 != EVP_EncryptUpdate(ctx, ciphertext, &len, plaintext, plaintext_len))
+        return -1;
+
+    ciphertext_len = len;
+
+    if (1 != EVP_EncryptFinal_ex(ctx, ciphertext + len, &len))
+        return -1;
+
+    ciphertext_len += len;
+
+    EVP_CIPHER_CTX_free(ctx);
+    return 0;
+}
 //-------------------------------------------------------------------------------------------------------
 
 
@@ -317,6 +347,18 @@ void ngx_http_encrypt_content(ngx_str_t encrypt_type, ngx_str_t encrypt_key, cha
 		}
 		converToHex(ct2, 32, result, r);*/
 		//ngx_log_error(NGX_LOG_EMERG, r->connection->log, 0, "result2===:%s", result);
+		unsigned char key[33];
+		unsigned char plaintext[strlen(content)];
+		ngx_memcpy(key, encrypt_key.data, encrypt_key.len);
+		key[encrypt_key.len] = '\0';
+		ngx_memcpy(plaintext, content, strlen(content));
+		plaintext[strlen(content)] = '\0';
+		ngx_log_error(NGX_LOG_EMERG, r->connection->log, 0, "aes_key:=%s, plaintext:=%s", key, plaintext);
+		int plaintext_len = strlen((char *)plaintext);
+		//encrypt(only support ecb here)
+		*result = realloc(*result, sizeof(char) * 512);
+		ngx_memset(*result, 0, 512);
+		aes_encrypt(plaintext, plaintext_len, key, (unsigned char *)*result);
 	} else if (ngx_strcasecmp(encrypt_type.data, des) == 0) {
 		exit(-1);
 	}
