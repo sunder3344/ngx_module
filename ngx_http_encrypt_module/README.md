@@ -7,7 +7,7 @@ encrypt request url parameters authorization, support MD5, AES, DES（for furthe
 - ./configure --prefix=/usr/local/nginx/ --add-module=/home/sunder/bin/ngx_http_encrypt_module
 - make && make install
 - start nginx with nginx.conf
-- 
+
 ## nginx.confg configuration
 ```
  server {
@@ -57,11 +57,11 @@ the response header will give you a key "Auth-Result"
 
 for example:
 
-![Alt Text](../../pic/request_unauth.png)
+![Alt Text](../pic/request_unauth.png)
 
 header param:
 base64_encode(md5(value1=1&value2=3&value3=2&DerekSunder))= ZTM3YjI5OWU3OGY0YTE3ZjY5MDQ1ZDBjNzQ4MjNiZGM=
 
 so the sign param should be "ZTM3YjI5OWU3OGY0YTE3ZjY5MDQ1ZDBjNzQ4MjNiZGM="
 
-![Alt Text](../../pic/request_auth.png)
+![Alt Text](../pic/request_auth.png)
