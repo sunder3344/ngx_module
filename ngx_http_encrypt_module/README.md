@@ -4,7 +4,7 @@ encrypt request url parameters authorization, support MD5, AES, DES（for furthe
 
 ## complile
 
-- ./configure --prefix=/usr/local/nginx/ --add-module=/home/sunder/bin/ngx_http_encrypt_module
+- ./configure --prefix=/usr/local/nginx/ --add-module=/home/sunder/bin/ngx_http_encrypt_module --with-ld-opt="-lssl -lcrypto"
 - make && make install
 - start nginx with nginx.conf
 
