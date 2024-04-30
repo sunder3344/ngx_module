@@ -1,2 +1,3 @@
-# ngx_module
-nginx module develop
+# ngx_http_encrypt_module
+
+request url encrypt model, support md5, aes, des
