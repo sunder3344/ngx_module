@@ -43,7 +43,7 @@ encrypt request url parameters authorization, support MD5, AES, DES（for furthe
 
 > `encrypt_type`: md5/aes/des
 
-> `encrypt_key`: your encrypt_key
+> `encrypt_key`: your encrypt_key(aes only support ecb, key length should be 32)
 
 > `encrypt_param`: the parameters which you want to encrypt
 
