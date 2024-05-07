@@ -56,7 +56,7 @@ static void *ngx_http_encrypt_create_loc_conf(ngx_conf_t *cf);
 static ngx_int_t ngx_http_encrypt_init(ngx_conf_t *cf);
 static ngx_int_t ngx_http_encrypt_combine_params(ngx_array_t *requires, ngx_log_t *log, char *content, ngx_http_headers_in_t *headers_in);
 static char *ngx_http_encrypt_param(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);
-void ngx_http_encrypt_content(ngx_str_t encrypt_type, ngx_str_t encrypt_key, char *content, char **result, ngx_http_request_t *r);
+int ngx_http_encrypt_content(ngx_str_t encrypt_type, ngx_str_t encrypt_key, char *content, char **result, ngx_http_request_t *r);
 //-------------------------------------------------------------------------------------------------------
 
 //--------------------------------------------------for AES----------------------------------------------
@@ -212,10 +212,14 @@ ngx_http_encrypt_header(ngx_http_request_t *r)
     ngx_http_encrypt_combine_params(slcf->encrypt_param, r->connection->log, content, headers_in);
     ngx_log_error(NGX_LOG_EMERG, r->connection->log, 0, "content:%s", content);
     //去加密
-    char *result = (char *)malloc(sizeof(char)*1);
-    ngx_memset(result, 0, 1);
-    ngx_http_encrypt_content(slcf->encrypt_type, slcf->encrypt_key, content, &result, r);
-    ngx_log_error(NGX_LOG_EMERG, r->connection->log, 0, "result===:%s, len=%d", result, strlen(result));
+    char *result = (char *)malloc(sizeof(char)*2);
+    ngx_memset(result, 0, 2);
+    int res = ngx_http_encrypt_content(slcf->encrypt_type, slcf->encrypt_key, content, &result, r);
+    ngx_log_error(NGX_LOG_EMERG, r->connection->log, 0, "result===:%s, len=%d, res=%d", result, strlen(result), res);
+    //判断是否加密类型是md5/AES
+    if (res == -1) {
+    	return NGX_HTTP_INTERNAL_SERVER_ERROR;
+    }
 
     src.len = strlen(result);
 	src.data = (u_char *) result;
@@ -313,10 +317,10 @@ ngx_http_encrypt_header(ngx_http_request_t *r)
 /**
  * 加密
  */
-void ngx_http_encrypt_content(ngx_str_t encrypt_type, ngx_str_t encrypt_key, char *content, char **result, ngx_http_request_t *r) {
+int ngx_http_encrypt_content(ngx_str_t encrypt_type, ngx_str_t encrypt_key, char *content, char **result, ngx_http_request_t *r) {
 	u_char md5[] = "md5";
 	u_char aes[] = "aes";
-	u_char des[] = "des";
+	int compare_res = -1;
 	if (ngx_strcasecmp(encrypt_type.data, md5) == 0) {
 		ngx_md5_t md5;
 		ngx_md5_init(&md5);
@@ -334,19 +338,8 @@ void ngx_http_encrypt_content(ngx_str_t encrypt_type, ngx_str_t encrypt_key, cha
 			strcat(*result, str);
 			free(str);
 		}
+		compare_res = 1;
 	} else if (ngx_strcasecmp(encrypt_type.data, aes) == 0) {
-		/*const uint8_t *key_data = (const uint8_t *)encrypt_key.data;
-		uint8_t key2[encrypt_key.len];
-		memcpy(key2, key_data, encrypt_key.len);
-		//ngx_log_error(NGX_LOG_EMERG, r->connection->log, 0, "key2:%s", key2);
-		const uint8_t *data = (uint8_t *)encrypt_type.data;
-		uint8_t ct2[32] = {0};
-		aesEncrypt(key2, 16, data, ct2, 32);
-		for (int i = 0; i < 32; i++) {
-			ngx_log_error(NGX_LOG_EMERG, r->connection->log, 0, "ct2[%d]==:%s, %d", i, ct2[i], ct2[i]);
-		}
-		converToHex(ct2, 32, result, r);*/
-		//ngx_log_error(NGX_LOG_EMERG, r->connection->log, 0, "result2===:%s", result);
 		unsigned char key[33];
 		unsigned char plaintext[strlen(content)];
 		ngx_memcpy(key, encrypt_key.data, encrypt_key.len);
@@ -359,9 +352,13 @@ void ngx_http_encrypt_content(ngx_str_t encrypt_type, ngx_str_t encrypt_key, cha
 		*result = realloc(*result, sizeof(char) * 512);
 		ngx_memset(*result, 0, 512);
 		aes_encrypt(plaintext, plaintext_len, key, (unsigned char *)*result);
-	} else if (ngx_strcasecmp(encrypt_type.data, des) == 0) {
-		exit(-1);
+		compare_res = 1;
+	} else {
+		compare_res = -1;
+		free(*result);
+		ngx_log_error(NGX_LOG_EMERG, r->connection->log, 0, "other_result:=%s", *result);
 	}
+	return compare_res;
 }
 
 static ngx_int_t ngx_http_encrypt_combine_params(ngx_array_t *requires, ngx_log_t *log, char *content, ngx_http_headers_in_t *headers_in)
