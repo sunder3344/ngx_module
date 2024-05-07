@@ -36,6 +36,20 @@ encrypt request url parameters authorization, support MD5, AES
         location = /50x.html {
             root   html;
         }
+
+        location ~ \.php$ {
+            encrypt_switch  on;
+            encrypt_type    aes;
+            encrypt_key     c4ca4238a0b923820dcc509a6f75849b;
+            encrypt_param   value1 value2 value3;
+
+            root           html;
+            fastcgi_pass   127.0.0.1:9000;
+            fastcgi_index  index.php;
+            fastcgi_param  SCRIPT_FILENAME  /scripts$fastcgi_script_name;
+            include        fastcgi_params;
+            include        fastcgi.conf;
+        }
         ...
 }
 ```
