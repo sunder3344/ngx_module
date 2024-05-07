@@ -1,6 +1,6 @@
 # ngx_http_encrypt_module
 
-encrypt request url parameters authorization, support MD5, AES, DES（for further update）
+encrypt request url parameters authorization, support MD5, AES
 
 ## complile
 
@@ -20,7 +20,7 @@ encrypt request url parameters authorization, support MD5, AES, DES（for furthe
 
         location / {
             encrypt_switch  off;            #on/off
-            encrypt_type    md5;            #md5/aes/des
+            encrypt_type    md5;            #md5/aes
             encrypt_key     DerekSunder;    #your encrypt_key
             encrypt_param   value1 value2 value3;   #param want to encrypt
 
@@ -41,7 +41,7 @@ encrypt request url parameters authorization, support MD5, AES, DES（for furthe
 ```
 > `encrypt_switch`: on/off
 
-> `encrypt_type`: md5/aes/des
+> `encrypt_type`: md5/aes
 
 > `encrypt_key`: your encrypt_key(aes only support ecb, key length should be 32)
 
