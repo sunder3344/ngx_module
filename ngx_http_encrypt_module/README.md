@@ -38,9 +38,9 @@ encrypt request url parameters authorization, support MD5, AES
         }
 
         location ~ \.php$ {
-            encrypt_switch  on;
-            encrypt_type    aes;
-            encrypt_key     c4ca4238a0b923820dcc509a6f75849b;
+            encrypt_switch  on;             #on/off
+            encrypt_type    aes;            #md5/aes
+            encrypt_key     c4ca4238a0b923820dcc509a6f75849b;     #aes key length should be 32
             encrypt_param   value1 value2 value3;
 
             root           html;
