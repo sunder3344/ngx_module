@@ -4,7 +4,7 @@ nginx output content replaced in output html(you can embed your advertisement ta
 
 ## complile
 
-- ./configure --prefix=/usr/local/nginx/ --add-module=/home/sunder/bin/ngx_filter --with-ld-opt="-lssl -lcrypto"
+- ./configure --prefix=/usr/local/nginx/ --add-module=/home/sunder/bin/ngx_http_ad_filter_module --with-ld-opt="-lssl -lcrypto"
 - make && make install
 - start nginx with nginx.conf
 
