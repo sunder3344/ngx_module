@@ -84,4 +84,4 @@ for example:
 
 ![Alt Text](../pic/ad_replace_after.jpg)
 
-http://*.*.*.*/1.html(content has been replaced)
+http://127.0.0.1/1.html(content has been replaced)
