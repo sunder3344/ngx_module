@@ -1,6 +1,6 @@
 # ngx_http_ad_filter_module
 
-advertisement tag replace in output html
+nginx output content replaced in output html(you can embed your advertisement tag in it)
 
 ## complile
 
