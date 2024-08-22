@@ -24,8 +24,8 @@ advertisement tag replace in output html
             #encrypt_key     DerekSunder;    #your encrypt_key
             #encrypt_param   value1 value2 value3;   #param want to encrypt
 
-			ad_switch       on;														#on/off
-            ad_replace      "<!--AD_BLOCK-->";										#content which want to be replaced
+            ad_switch       on;									#on/off
+            ad_replace      "<!--AD_BLOCK-->";							#content which want to be replaced
             ad_content      "<div class=\"ad-banner\">Your Ad Here</div>";			#replaced content
 
             root   html;
@@ -47,8 +47,8 @@ advertisement tag replace in output html
             #encrypt_key     c4ca4238a0b923820dcc509a6f75849b;     #aes key length should be 32
             #encrypt_param   value1 value2 value3;
 
-			ad_switch       on;														#on/off
-            ad_replace      "<!--AD_BLOCK-->";										#content which want to be replaced
+	    ad_switch       on;									#on/off
+            ad_replace      "<!--AD_BLOCK-->";							#content which want to be replaced
             ad_content      "<div class=\"ad-banner\">Your Ad Here</div>";			#replaced content
 
             root           html;
