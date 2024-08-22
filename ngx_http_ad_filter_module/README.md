@@ -63,8 +63,6 @@ nginx output content replaced in output html(you can embed your advertisement ta
 ```
 > `ad_switch`: on/off
 
-> `encrypt_type`: md5/aes
-
 > `ad_replace`: the content which you want to be replaced
 
 > `ad_content`: replaced content
@@ -78,9 +76,12 @@ the response header will give you a key "Ad-Filter"
 > `off`: this filter has been closed
 
 for example:
+
 ![Alt Text](../pic/ad_replace_before.jpg)
+
 1.html(raw data)
 
 
 ![Alt Text](../pic/ad_replace_after.jpg)
+
 http://*.*.*.*/1.html(content has been replaced)
