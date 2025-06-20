@@ -112,17 +112,18 @@ ngx_http_ad_header_filter(ngx_http_request_t *r)
     acf = ngx_http_get_module_loc_conf(r, ngx_http_ad_filter_module);
     headers_out = &r->headers_out;
 
-    //输出头信息
-    h = ngx_list_push(&headers_out->headers);
-    if (h == NULL) {
-    	return NGX_ERROR;
-    }
     if (acf->ad_switch != 1) {			//swith off, keep next filtering
 		return ngx_http_next_header_filter(r);
-	} else {
-		ngx_str_set(&h->key, "Ad-Filter");
-		ngx_str_set(&h->value, "on");
 	}
+
+	//输出头信息
+    h = ngx_list_push(&headers_out->headers);
+    if (h == NULL) {
+       	return NGX_ERROR;
+    }		
+
+	ngx_str_set(&h->key, "Ad-Filter");
+	ngx_str_set(&h->value, "on");
     h->hash = 1;		//if neet hash process
     r->headers_out.status = NGX_HTTP_OK;
     r->headers_out.content_length_n = -1;
@@ -165,6 +166,8 @@ ngx_http_ad_body_filter(ngx_http_request_t *r, ngx_chain_t *in)
 
 	for (cl = in; cl; cl = cl->next) {
 		buf = cl->buf;
+//		ngx_log_error(NGX_LOG_INFO, r->connection->log, 0, "in_file:=%d", buf->in_file);
+//		ngx_log_error(NGX_LOG_INFO, r->connection->log, 0, "in_memory:=%d", ngx_buf_in_memory(buf));
 
 		if (buf->in_file) {
 		    off_t file_offset = buf->file_pos;
@@ -232,7 +235,7 @@ ngx_http_ad_body_filter(ngx_http_request_t *r, ngx_chain_t *in)
 
 			last = new_cl;
 		} else if (ngx_buf_in_memory(buf)) {
-			if (buf->pos == NULL || buf->last == NULL || ngx_strlen(buf->pos) == 0 || ngx_strlen(buf->last) == 0 || buf->pos == buf->last) {
+			if (buf->pos == NULL || buf->last == NULL || ngx_strlen(buf->pos) == 0 || buf->pos == buf->last) {
 			    ngx_log_error(NGX_LOG_INFO, r->connection->log, 0, "buffer is empty or not initialized correctly");
 			    return ngx_http_next_body_filter(r, in);
 			}
@@ -280,7 +283,11 @@ ngx_http_ad_body_filter(ngx_http_request_t *r, ngx_chain_t *in)
 		}
 	}
 
-	rc = ngx_http_next_body_filter(r, out);
+	if (out == NULL) {
+		rc = ngx_http_next_body_filter(r, in);
+	} else {
+		rc = ngx_http_next_body_filter(r, out);
+	}
 	if (rc == NGX_ERROR) {
 	    ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "Error in next body filter");
 	    return NGX_ERROR;
